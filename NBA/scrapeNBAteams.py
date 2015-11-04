@@ -22,9 +22,8 @@ def index():
     print "entered index"
     times = []
     halftime_ids = []
-    today = date.today() - timedelta(days=1)
+    today = date.today() 
     today = today.strftime("%Y%m%d")
-#    today = '20151028'
     url = urllib2.urlopen('http://scores.espn.go.com/nba/scoreboard?date=' + today)
     soup = bs(url.read(), ['fast', 'lxml'])
     #scoreboard=soup.findAll('div', {'id': 'scoreboard-page'})
@@ -56,16 +55,17 @@ def index():
             cols0 = soup1.findAll('tr', {'class':'colhead'})[0]
             colnames0 = cols0.findAll('a')
             colnames0 = [c.text for c in colnames0]
-
+            today = date.today()
+            today = today.strftime("%m/%d/%Y")
             try:
                 with db:
-                    db.execute('''INSERT INTO NBAseasonstats(team, the_date, fgm, fga, fgp, tpm, tpa, tpp, ftm, fta, ftp, twopm, twopa, twopp, pps, afg) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (teams[i].upper(),today.strftime("%m/%d/%Y"),float(values1[1]),float(values1[2]),float(values1[3]),float(values1[4]),float(values1[5]),float(values1[6]),float(values1[7]),float(values1[8]),float(values1[9]),float(values1[10]),float(values1[11]),float(values1[12]),float(values1[13]),float(values1[14])))
+                    db.execute('''INSERT INTO NBAseasonstats(team, the_date, fgm, fga, fgp, tpm, tpa, tpp, ftm, fta, ftp, twopm, twopa, twopp, pps, afg) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (teams[i].upper(),today,float(values1[1]),float(values1[2]),float(values1[3]),float(values1[4]),float(values1[5]),float(values1[6]),float(values1[7]),float(values1[8]),float(values1[9]),float(values1[10]),float(values1[11]),float(values1[12]),float(values1[13]),float(values1[14])))
                     db.commit()
             except sqlite3.IntegrityError:
                 print 'Team1 Season Stats Already Exist!'
             try: 
                 with db:
-                    db.execute('''INSERT INTO NBAseasontotals(team, the_date, gp, ppg, orpg, defr, rpg, apg, spg, bpg, tpg, fpg, ato) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)''', (teams[i].upper(), today.strftime("%m/%d/%Y"), int(values0[1]),  float(values0[4]), float(values0[5]), float(values0[6]), float(values0[7]), float(values0[8]), float(values0[9]), float(values0[10]), float(values0[11]), float(values0[12]), float(values0[13])))
+                    db.execute('''INSERT INTO NBAseasontotals(team, the_date, gp, ppg, orpg, defr, rpg, apg, spg, bpg, tpg, fpg, ato) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)''', (teams[i].upper(), today, int(values0[1]),  float(values0[4]), float(values0[5]), float(values0[6]), float(values0[7]), float(values0[8]), float(values0[9]), float(values0[10]), float(values0[11]), float(values0[12]), float(values0[13])))
                     db.commit()
             except sqlite3.IntegrityError:
                 print 'Team1 Season Totals Already Exist!'
@@ -74,4 +74,5 @@ def index():
 
 index()
 db.close()
+
 

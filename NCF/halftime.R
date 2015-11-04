@@ -64,7 +64,7 @@ wide$spread.team1 <- as.numeric(gsub("\\+", "", wide$spread.team1)) * -1
 wide$abs.score.diff <- abs(wide$score.diff)
 wide$abs.spread <- abs(wide$spread.team1)
 
-load("model.Rdat")
+load("rf.Rdat")
 
 w <- wide
 #w$second.half.score.team1 <- w$score.y.team1  -  w$score.team1
@@ -105,6 +105,6 @@ w$score.diff <- w$favorite.score - w$underdog.score
 w$favorite.trailing <- w$score.diff < 0
 
 
-w$over.prediction <- predict(m3, w, type="response") >= .5
+w$over.prediction <- predict(r, w)
 x <- w[order(w$game_date.x.team2),c("game_id", "game_date.x.team2", "score.diff", "first.half.points", "half.line", "spread.team1", "over.prediction", "team.team1", "team.team2")]
-x[which(x$game_date.x.team2 == "10/24/2015"),]
+x[which(x$game_date.x.team2 == "10/31/2015"),]
