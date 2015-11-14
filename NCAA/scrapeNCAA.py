@@ -1,11 +1,12 @@
 __author__ = 'tanyacashorali'
 
+import jsonpickle
 import random
 import urllib2
 import time
 import re
 import random
-from datetime import date
+from datetime import date, timedelta
 import datetime
 import os
 import sqlite3
@@ -18,6 +19,9 @@ db = sqlite3.connect('/home/ec2-user/sports2015/NCAA/sports.db')
 x=random.randint(1, 20)
 time.sleep(x)
 
+cur = db.execute("SELECT game_id from NCAAstats")
+game_ids = cur.fetchall()
+game_ids = [str(g[0]) for g in game_ids]
 
 def index():
     print "entered index"
@@ -25,34 +29,34 @@ def index():
     halftime_ids = []
     today = date.today()
     today = today.strftime("%Y%m%d")
-    vals = [50,55,56,100]
-    for v in range(0,4):
-        url = urllib2.urlopen('http://scores.espn.go.com/ncb/scoreboard?date=' + today + '&confId=' + str(vals[v]))
-        x=random.randint(5,10)
+    #vals = [50,3,46,2,1,62,8,4,5,6,7,9,11,10,45,12,13,14,16,18,44,19,20,21,22,23,26,24,25,49,27,30,29]
+    vals = [0,50,8,4,21]
+    for v in range(0,len(vals)):
+        url = urllib2.urlopen('http://scores.espn.go.com/mens-college-basketball/scoreboard/_/group/' + str(vals[v]) + '/date/' + today)
+        x=random.randint(2,4)
         time.sleep(x)
         soup = bs(url.read(), ['fast', 'lxml'])
-        game_status = soup.findAll('p', id=re.compile('\d+-statusLine'))
-        links = soup.findAll('a', href=re.compile('/ncb/boxscore.*'))
-        urls = [link.get('href') for link in links]
-        matches=[re.search('gameId=(\d+)', u) for u in urls]
-        ids = [m.group(1) for m in matches]
-        ht = re.compile('Half')
-
-        ## freeze updates at the half
-        for game in game_status:
-            if (re.search(ht, game.text) and re.search("(\d+)", game["id"]).group() not in halftime_ids):
-                halftime_ids.append(re.search("(\d+)", game["id"]).group())
-        league = 'ncb'
+        data=re.search('window.espn.scoreboardData.*{(.*)};</script>', str(soup)).group(0)
+        jsondata=re.search('({.*});window', data).group(1)
+        j=jsonpickle.decode(jsondata)
+        games=j['events']
+        status = [game['status'] for game in games]
+        half = [s['type']['shortDetail'] for s in status]
+        index = [i for i, j in enumerate(half) if j == 'Halftime']
+        ids = [game['id'] for game in games]
+        halftime_ids = [j for k, j in enumerate(ids) if k in index]
+        halftime_ids = list(set(halftime_ids) - set(game_ids))
+        print len(halftime_ids)
+        league = 'ncaa'
         if(len(halftime_ids) == 0):
             print "No Halftime Box Scores yet."
         else:
             for i in range(0, len(halftime_ids)):
                 x=random.randint(5, 10)
                 time.sleep(x)
-                espn = 'http://scores.espn.go.com/' + league + '/boxscore?gameId=' + halftime_ids[i]
+                espn = 'http://espn.go.com/mens-college-basketball/boxscore?gameId=' + halftime_ids[i]
                 url = urllib2.urlopen(espn)
                 soup = bs(url.read(), ['fast', 'lxml'])
-                #soup = bs(open('testPage2.html'))
                 game_date = soup.findAll('div', {'class':'game-time-location'})[0].p.text
                 the_date =  re.search(',\s(.*)', game_date).group(1)
                 the_time = re.search('^(.*?),', game_date)

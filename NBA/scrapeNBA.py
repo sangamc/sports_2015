@@ -28,9 +28,6 @@ def index():
     today = today.strftime("%Y%m%d")
     url = urllib2.urlopen('http://scores.espn.go.com/nba/scoreboard?date=' + today)
     soup = bs(url.read(), ['fast', 'lxml'])
-    #soup = bs(open('testPage1.html'))
-    #scoreboard=soup.findAll('div', {'id': 'scoreboard-page'})
-    #data=scoreboard[0].get('data-data')
     data=re.search('window.espn.scoreboardData.*{(.*)};</script>', str(soup)).group(0)
     jsondata=re.search('({.*});window', data).group(1)
     j=jsonpickle.decode(jsondata)
@@ -51,7 +48,6 @@ def index():
             espn = 'http://scores.espn.go.com/' + league + '/boxscore?gameId=' + halftime_ids[i]
             url = urllib2.urlopen(espn)
             soup = bs(url.read(), ['fast', 'lxml'])
-            #soup = bs(open('testPage2.html'))
             game_date = soup.findAll('div', {'class':'game-time-location'})[0].p.text
             the_date =  re.search(',\s(.*)', game_date).group(1)
             the_time = re.search('^(.*?),', game_date)
@@ -59,8 +55,6 @@ def index():
             t=time.strptime(the_date, "%B %d, %Y")
             gdate=time.strftime('%m/%d/%Y', t)
             boxscore = soup.find('table', {'class':'mod-data'})
- #           strong = soup.find_all('strong', text=re.compile('Officials'))
- #           officials = strong[0].next_sibling
             try: 
                 theads=boxscore.findAll('thead')
                 the_thead = None

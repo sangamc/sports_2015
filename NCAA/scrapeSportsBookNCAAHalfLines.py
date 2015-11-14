@@ -12,7 +12,7 @@ from urlparse import urlparse
 from bs4 import BeautifulSoup as bs
 from datetime import date, timedelta
 
-edb = sqlite3.connect('/home/ec2-user/sports2015/NCAA/sports.db')
+db = sqlite3.connect('/home/ec2-user/sports2015/NCAA/sports.db')
 
 x=random.randint(1, 20)
 time.sleep(x)
