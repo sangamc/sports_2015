@@ -116,8 +116,8 @@ dt[, (nm2):=lapply(.SD, function(x) c(NA, x[-.N])), by=team, .SDcols=nm1]
 halfbox <- data.frame(dt)
 halfbox <- halfbox[,-grep("^season", colnames(halfbox))]
 
-secondhalf.box <- both.halves[,c("game_id", "game_date.x", "team", "third_downs_2H", "third_down_att_2H", "fourth_downs_2H", "fourth_down_att_2H", "penalties_2H", 
-                  "penalty_yards_2H", "total_yards_2H", "pass_yards_2H", "turnovers_2H", "score.y")]
+secondhalf.box <- both.halves[,c("game_id", "game_date.x", "team", "third_downs_2H", "third_down_att_2H", "fourth_downs_2H", "fourth_down_att_2H", 
+"penalties_2H", "penalty_yards_2H", "total_yards_2H", "pass_yards_2H", "turnovers_2H", "score.y")]
 
 
 ## calculate running second half season averages and merge with all data
@@ -148,7 +148,6 @@ dt[, (nm2):=lapply(.SD, function(x) c(NA, x[-.N])), by=team, .SDcols=nm1]
 secondhalf.box <- data.frame(dt)
 secondhalf.box <- secondhalf.box[,-grep("^season", colnames(secondhalf.box))]
 
-
 secondhalf.box <- merge(games, secondhalf.box, by="game_id")
 secondhalf.box <- secondhalf.box[,c(-2,-8:-10, -11:-14)]
 secondhalf.box <- secondhalf.box[order(secondhalf.box$game_id),]
@@ -159,90 +158,12 @@ secondhalf.box$tempteam[which(secondhalf.box$team != secondhalf.box$away_espn.x)
 
 wide<-reshape(halfbox[,c(-2:-5)], direction = "wide", idvar="game_id", timevar="tempteam")
 widefinal<-reshape(secondhalf.box[,c(-2:-3)], direction = "wide", idvar="game_id", timevar="tempteam")
-#colnames(widefinal) <- paste0("final_", colnames(widefinal))
-
 
 wide <- subset(wide, select = -c(line.x.team2, spread.team2, line.y.team2 ))
 widefinal<-subset(widefinal, select=-c(line.x.team2, spread.team2, line.x.team1, spread.team1))
 
-# widefinal<-cbind(widefinal, do.call('rbind', strsplit(widefinal$final_third_downs.team1, "-")))
-# widefinal<-cbind(widefinal, do.call('rbind', strsplit(widefinal$final_fourth_downs.team1, "-")))
-# widefinal<-cbind(widefinal, do.call('rbind', strsplit(widefinal$final_comp_att.team1, "-")))
-# widefinal<-cbind(widefinal, do.call('rbind', strsplit(widefinal$final_penalties.team1, "-")))
-# widefinal<-cbind(widefinal, do.call('rbind', strsplit(widefinal$final_third_downs.team2, "-")))
-# widefinal<-cbind(widefinal, do.call('rbind', strsplit(widefinal$final_fourth_downs.team2, "-")))
-# widefinal<-cbind(widefinal, do.call('rbind', strsplit(widefinal$final_comp_att.team2, "-")))
-# widefinal<-cbind(widefinal, do.call('rbind', strsplit(widefinal$final_penalties.team2, "-")))
-
-# colnames(widefinal)[38:53] <- c("final_third_downs.team1", "final_third_down_att.team1", "final_fourth_downs.team1", "final_fourth_down_att.team1", 
-#                 "final_comp.team1","final_comp_att.team1","final_penalties.team1", "final_penalty_yards.team1", "final_third_downs.team2", 
-#                 "final_third_downs_att.team2", "final_fourth_downs.team2","final_fourth_down_att.team2", "final_comp.team2", 
-#                 "final_comp_att.team2", "final_penalties.team2", "final_penalty_yards.team2")
-# widefinal <- widefinal[,c(-5:-6, -9,-14, -23:-24,-27,-32)]
-# widefinal[,30:45]<-apply(widefinal[,30:45], 2, as.numeric)
-
-
 all <- merge(wide, widefinal, by="game_id")
 colnames(all) <- gsub("lag\\.", "", colnames(all))
-
-
-
-# passing$game_date<-as.Date(passing$the_date, format='%m/%d/%Y')
-# passing$key <- paste(passing$game_date, passing$team)
-# i<-grep("\\s{1}0",passing$the_date)
-# passing$game_date[i] <- passing[i,]$game_date - 1
-# passing$game_date<-format(passing$game_date, "%m/%d/%Y")
-# passing$key <- paste(passing$game_date, passing$team)
-# pass_stats<-passing[match(all$key, passing$key),c(3:8)]
-# colnames(pass_stats) <- paste0("season_pass_team1_", colnames(pass_stats))
-# all <- cbind(all, pass_stats)
-
-# all$key<-paste(all$final_game_date.x.team2, all$final_team.team2)
-# pass_stats<-passing[match(all$key, passing$key),c(3:8)]
-# colnames(pass_stats) <- paste0("season_pass_team2_", colnames(pass_stats))
-# all <- cbind(all, pass_stats)
-
-# ## Merge in season stats rushing
-# rushing$game_date<-substr(rushing[,2], 0,10)
-# all$key<-paste(all$final_game_date.x.team1, all$final_team.team1)
-# rushing$game_date<-as.Date(rushing$the_date, format='%m/%d/%Y')
-# rushing$key <- paste(rushing$game_date, rushing$team)
-# i<-grep("\\s{1}0",rushing$the_date)
-# rushing$game_date[i] <- rushing[i,]$game_date - 1
-# rushing$game_date<-format(rushing$game_date, "%m/%d/%Y")
-# rushing$key <- paste(rushing$game_date, rushing$team)
-# rush_stats<-rushing[match(all$key, rushing$key),c(3:7)]
-# colnames(rush_stats) <- paste0("season_rush_team1_", colnames(rush_stats))
-# all <- cbind(all, rush_stats)
-
-# all$key<-paste(all$final_game_date.x.team2, all$final_team.team2)
-# rush_stats<-rushing[match(all$key, rushing$key),c(3:7)]
-# colnames(rush_stats) <- paste0("season_rush_team2_", colnames(rush_stats))
-# all <- cbind(all, rush_stats)
-
-
-# ## Merge in receiving season data
-# receiving$game_date<-substr(receiving[,2], 0,10)
-# all$key<-paste(all$final_game_date.x.team1, all$final_team.team1)
-# receiving$game_date<-as.Date(receiving$the_date, format='%m/%d/%Y')
-# receiving$key <- paste(receiving$game_date, receiving$team)
-# i<-grep("\\s{1}0",receiving$the_date)
-# receiving$game_date[i] <- receiving[i,]$game_date - 1
-# receiving$game_date<-format(receiving$game_date, "%m/%d/%Y")
-# receiving$key <- paste(receiving$game_date, receiving$team)
-# rec_stats<-receiving[match(all$key, receiving$key),c(3:7)]
-# colnames(rec_stats) <- paste0("season_rec_team1_", colnames(rec_stats))
-# all <- cbind(all, rec_stats)
-
-# all$key<-paste(all$final_game_date.x.team2, all$final_team.team2)
-# rec_stats<-rushing[match(all$key, receiving$key),c(3:7)]
-# colnames(rec_stats) <- paste0("season_rec_team2_", colnames(rec_stats))
-# all <- cbind(all, rec_stats)
-
-
-#vals<-apply(all, 2, function(x) grep("\\d+-|:", x))
-#quote.cols <- which(lapply(vals, length) != 0)
-#all[,which(lapply(vals, length) != 0)] <- apply(all[,which(lapply(vals, length) != 0)], 2, function(x) paste0('="', x, '"'))
 
 write.csv(all, file="/home/ec2-user/sports2015/NCF/testfile.csv", row.names=FALSE)
 

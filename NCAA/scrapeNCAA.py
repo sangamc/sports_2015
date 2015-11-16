@@ -30,7 +30,7 @@ def index():
     today = date.today()
     today = today.strftime("%Y%m%d")
     #vals = [50,3,46,2,1,62,8,4,5,6,7,9,11,10,45,12,13,14,16,18,44,19,20,21,22,23,26,24,25,49,27,30,29]
-    vals = [0,50,8,4,21]
+    vals = [50]
     for v in range(0,len(vals)):
         url = urllib2.urlopen('http://scores.espn.go.com/mens-college-basketball/scoreboard/_/group/' + str(vals[v]) + '/date/' + today)
         x=random.randint(2,4)

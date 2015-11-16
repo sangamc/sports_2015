@@ -32,7 +32,7 @@ def index():
     today = date.today()
     today = today.strftime("%Y%m%d")
     #vals = [50,55,56,100]
-    vals = [0,50,8,4,21]
+    vals = [50]
     for vi in range(0,len(vals)):
         url = urllib2.urlopen('http://espn.go.com/mens-college-basketball/scoreboard/_/group/' + str(vals[vi]) + '/date/' + today)
         soup = bs(url.read(), ['fast', 'lxml'])
