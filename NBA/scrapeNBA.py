@@ -34,7 +34,7 @@ def index():
     games=j['events']
     status = [game['status'] for game in games]
     half = [s['type']['shortDetail'] for s in status]
-    index = [i for i, j in enumerate(half) if j == 'Halftime']
+    index = [i for i, j in enumerate(half) if j == 'HT']
     ids = [game['id'] for game in games]
     halftime_ids = [j for k, j in enumerate(ids) if k in index]
 
