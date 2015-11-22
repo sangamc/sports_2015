@@ -63,10 +63,51 @@ wide$score.diff<-wide$score.team1 - wide$score.team2
 wide$spread.team1 <- as.numeric(gsub("\\+", "", wide$spread.team1)) * -1
 wide$abs.score.diff <- abs(wide$score.diff)
 wide$abs.spread <- abs(wide$spread.team1)
+wide$team1.favorite <- wide$spread.team1 < 0
 
 load("rf.Rdat")
 
 w <- wide
+
+w$favorite.yards <- 0
+w$underdog.yards <- 0
+w$favorite.yards[which(w$team1.favorite == TRUE)] <- w[which(w$team1.favorite == TRUE),]$total_yards.team1
+w$favorite.yards[which(w$team1.favorite == FALSE)] <- w[which(w$team1.favorite == FALSE),]$total_yards.team2
+
+w$underdog.yards[which(w$team1.favorite == FALSE)] <- w[which(w$team1.favorite == FALSE),]$total_yards.team1
+w$underdog.yards[which(w$team1.favorite == TRUE)] <- w[which(w$team1.favorite == TRUE),]$total_yards.team2
+
+w$favorite100yds <- 0
+w$underdog100yds <- 0
+
+w$first.half.points100Yards.team1 <- w$score.team1 / w$total_yards.team1 * 100
+w$first.half.points100Yards.team2 <- w$score.team2 / w$total_yards.team2 * 100
+
+
+w$favorite100yds[which(w$team1.favorite == TRUE)] <- w[which(w$team1.favorite == TRUE),]$first.half.points100Yards.team1
+w$favorite100yds[which(w$team1.favorite == FALSE)] <- w[which(w$team1.favorite == FALSE),]$first.half.points100Yards.team2
+
+w$underdog100yds[which(w$team1.favorite == FALSE)] <- w[which(w$team1.favorite == FALSE),]$first.half.points100Yards.team1
+w$underdog100yds[which(w$team1.favorite == TRUE)] <- w[which(w$team1.favorite == TRUE),]$first.half.points100Yards.team2
+
+w$signal1 <- w$favorite100yds > 11
+w$signal2 <- w$favorite.yards > 355
+w$signal3 <- w$underdog.yards > 295
+w$signal4 <- w$underdog100yds > 15
+
+w$signal1 <- as.factor(w$signal1)
+w$signal2 <- as.factor(w$signal2)
+w$signal3 <- as.factor(w$signal3)
+w$signal4 <- as.factor(w$signal4)
+
+w$abn1 <- as.numeric(w$signal1) - 1
+w$abn2 <- as.numeric(w$signal2) - 1
+w$abn3 <- as.numeric(w$signal3) - 1
+w$abn4 <- as.numeric(w$signal4) - 1
+w$signals <- w$abn1 + w$abn2 + w$abn3 + w$abn4
+w$signals<-as.factor(w$signals)
+
+
 #w$second.half.score.team1 <- w$score.y.team1  -  w$score.team1
 #w$second.half.score.team2 <- w$score.y.team2  -  w$score.team2
 
@@ -103,8 +144,9 @@ w$underdog.yards[which(w$team1.favorite == TRUE)] <- w[which(w$team1.favorite ==
 w$yards.diff <- w$favorite.yards - w$underdog.yards
 w$score.diff <- w$favorite.score - w$underdog.score
 w$favorite.trailing <- w$score.diff < 0
+w$mwt <- w$score.team1 + w$score.team2 + w$half.line - as.numeric(w$line.x.team1)
 
-
+load("rpart.Rdat")
 w$over.prediction <- predict(r, w)
-x <- w[order(w$game_date.x.team2),c("game_id", "game_date.x.team2", "score.diff", "first.half.points", "half.line", "spread.team1", "over.prediction", "team.team1", "team.team2")]
-x[which(x$game_date.x.team2 == "11/07/2015"),]
+x <- w[order(w$game_date.x.team2),c("game_id", "game_date.x.team2", "score.diff", "first.half.points", "signals",  "half.line", "spread.team1", "over.prediction", "team.team1", "team.team2")]
+x[which(x$game_date.x.team2 == "11/21/2015"),]
