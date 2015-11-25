@@ -171,10 +171,10 @@ widefinal<-subset(widefinal, select=-c(line.x.team2, spread.x.team2, line.y.team
 
 all <- merge(wide, widefinal, by="game_id")
 colnames(all) <- gsub("lag\\.", "", colnames(all))
-colnames(all)[c(2,3,4,5,6)] <- c('team1', 'full_line', 'full_spread.team1', 'half_line', 'half_spread.team1')
+colnames(all)[c(38:42)] <- c('team1', 'full_line', 'full_spread.team1', 'half_line', 'half_spread.team1')
 
 all$first.half.points100Yards.team1 <- all$score.team1 / all$total_yards.team1 * 100
-all$first.half.points100Yards.team2 <- all$score.team2/ all$total_yards.team2 * 100
+all$first.half.points100Yards.team2 <- all$score.team2 / all$total_yards.team2 * 100
 
 
 write.csv(all, file="/home/ec2-user/sports2015/NCF/testfile.csv", row.names=FALSE)
