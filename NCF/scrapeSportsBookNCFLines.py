@@ -24,8 +24,8 @@ soup = bs(url.read(), ['fast', 'lxml'])
 the_date = date.today()
 
 divs=soup.findAll('div', id=re.compile( the_date.strftime("%m%d%y")))
-awayTeams=[d.findAll('span', {'id':'awayTeamName'}) for d in divs]
-homeTeams=[d.findAll('span', {'id':'homeTeamName'}) for d in divs]
+awayTeams=[d.findAll('span', {'id':'firstTeamName'}) for d in divs]
+homeTeams=[d.findAll('span', {'id':'secondTeamName'}) for d in divs]
 awayTeams = filter(len, awayTeams)
 homeTeams = filter(len, homeTeams)
 #awayTeams.pop(0)

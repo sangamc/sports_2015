@@ -20,8 +20,8 @@ time.sleep(x)
 url = urllib2.urlopen('https://www.sportsbook.ag/sbk/sportsbook4/ncaa-basketball-betting/ncaa-basketball-lines.sbk')
 soup = bs(url.read(), ['fast', 'lxml'])
 divs=soup.findAll('div', {'class':'col-sm-12 eventbox'})
-awayTeams=[d.findAll('span', {'id':'awayTeamName'}) for d in divs]
-homeTeams=[d.findAll('span', {'id':'homeTeamName'}) for d in divs]
+awayTeams=[d.findAll('span', {'id':'firstTeamName'}) for d in divs]
+homeTeams=[d.findAll('span', {'id':'secondTeamName'}) for d in divs]
 awayTeams=[a[0].text for a in awayTeams]
 homeTeams=[h[0].text for h in homeTeams]
 
