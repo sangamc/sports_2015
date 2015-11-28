@@ -181,19 +181,23 @@ result$chd_ftmU[is.na(result$chd_ftmU)] <- 0
 result$chd_toU[is.na(result$chd_toU)] <- 0
 result$underSum <- result$fullSpreadU + result$mwtU + result$chd_fgU + result$chd_fgmU + result$chd_tpmU + result$chd_ftmU + result$chd_toU
 
-#result <- subset(result, !is.na(LINE_HALF))
 result$SECOND_HALF_PTS <- result$FINAL_PTS - result$HALF_PTS
 result$Over<- ddply(result, .(GAME_ID), transform, over=sum(SECOND_HALF_PTS) > LINE_HALF)$over
-#fill <- which(is.na(result$underSum) | is.na(result$overSum) | is.na(result$LINE_HALF))
-#train <- result[-which(is.na(result$underSum) | is.na(result$overSum) | is.na(result$LINE_HALF)),]
-#result$overPred <- ""
-#r <- randomForest(formula = as.factor(Over) ~ underSum * overSum * LINE_HALF, data = train)
-#result$overPred[fill] <- "NA"
+result<-result[order(result$GAME_ID),]
+result$team <- ""
+result[seq(from=1, to=dim(result)[1], by=2),]$team <- "TEAM1"
+result[seq(from=2, to=dim(result)[1], by=2),]$team <- "TEAM2"
+wide<-reshape(result, direction = "wide", idvar="GAME_ID", timevar="team")
+wide$secondHalfPts.TEAM1 <- wide$FINAL_PTS.TEAM1 - wide$HALF_PTS.TEAM1
+wide$secondHalfPts.TEAM2 <- wide$FINAL_PTS.TEAM2 - wide$HALF_PTS.TEAM2
+wide$secondHalfPtsTotal <- wide$secondHalfPts.TEAM1 + wide$secondHalfPts.TEAM2
+wide$Over<-wide$secondHalfPtsTotal > wide$LINE_HALF.TEAM1
 
-#save(r, file="~/sports/randomForestModel.Rdat")
 
 
-write.csv(result, file="/home/ec2-user/sports/testfile.csv", row.names=FALSE)
+
+
+write.csv(wide, file="/home/ec2-user/sports/testfile.csv", row.names=FALSE)
 
 sendmailV <- Vectorize( sendmail , vectorize.args = "to" )
 #emails <- c( "<tanyacash@gmail.com>" , "<malloyc@yahoo.com>", "<sschopen@gmail.com>")

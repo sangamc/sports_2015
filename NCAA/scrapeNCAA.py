@@ -16,7 +16,7 @@ from bs4 import BeautifulSoup as bs
 
 db = sqlite3.connect('/home/ec2-user/sports2015/NCAA/sports.db')
 
-x=random.randint(1, 20)
+x=random.randint(4, 10)
 time.sleep(x)
 
 cur = db.execute("SELECT game_id from NCAAstats")
@@ -33,8 +33,6 @@ def index():
     vals = [50]
     for v in range(0,len(vals)):
         url = urllib2.urlopen('http://scores.espn.go.com/mens-college-basketball/scoreboard/_/group/' + str(vals[v]) + '/date/' + today)
-        x=random.randint(2,4)
-        time.sleep(x)
         soup = bs(url.read(), ['fast', 'lxml'])
         data=re.search('window.espn.scoreboardData.*{(.*)};</script>', str(soup)).group(0)
         jsondata=re.search('({.*});window', data).group(1)
@@ -52,7 +50,7 @@ def index():
             print "No Halftime Box Scores yet."
         else:
             for i in range(0, len(halftime_ids)):
-                x=random.randint(5, 10)
+                x=random.randint(2, 5)
                 time.sleep(x)
                 espn = 'http://espn.go.com/mens-college-basketball/boxscore?gameId=' + halftime_ids[i]
                 url = urllib2.urlopen(espn)

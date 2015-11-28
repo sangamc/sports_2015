@@ -49,8 +49,14 @@ def index():
                 x=random.randint(3,10)
                 time.sleep(x)
                 espn = 'http://espn.go.com/mens-college-basketball/boxscore?gameId=' + final_ids[i]
-                url = urllib2.urlopen(espn)
-                soup = bs(url.read(), ['fast', 'lxml'])
+                while True:
+                    try:
+                        url1 = urllib2.urlopen(espn)
+                    except:
+                        time.sleep(x)
+                        continue
+                    break
+                soup = bs(url1.read(), ['fast', 'lxml'])
                 game_date = soup.findAll('div', {'class':'game-time-location'})[0].p.text
                 the_date =  re.search(',\s(.*)', game_date).group(1)
                 the_time = re.search('^(.*?),', game_date)
