@@ -38,8 +38,17 @@ def index():
     j=jsonpickle.decode(jsondata) 
     print "entered index" + "conf=50"
     games = j['events']
-    teams1 = [g['competitions'][0]['competitors'][0]['team']['abbreviation'] for g in games]
-    teams2 = [g['competitions'][0]['competitors'][1]['team']['abbreviation'] for g in games]
+    teams1 = []
+    teams2 = []
+    for i in range(0, len(games)):
+        try:
+            teams1.append(games[i]['competitions'][0]['competitors'][0]['team']['abbreviation']) 
+        except:
+            continue
+        try:
+            teams2.append(games[i]['competitions'][0]['competitors'][1]['team']['abbreviation'])
+        except:
+            continue
     teams = teams1 + teams2
     ids1list = [re.findall('id\/(\d+)', str(g['competitions'][0]['competitors'][0]['team'])) for g in games]
     ids1 = [item for sublist in ids1list for item in sublist]

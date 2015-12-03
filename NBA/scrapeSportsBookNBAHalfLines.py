@@ -36,11 +36,23 @@ the_spreads=[m[1].text for m in market]
 lines = []
 spreads = []
 
-for i in range(0, len(the_lines)):
+if len(the_lines) > len(the_spreads):
+    upper = len(the_lines)
+else:
+    upper = len(the_spreads)
+
+for i in range(0, upper):
     try:
         lines.append(re.search('(\d+\\.?\d+)\\(', the_lines[i]).group(1))
-        spreads.append(re.search('([+-]?\d+\\.?\d?)\\(', the_spreads[i]).group(1))
     except:
+        lines.append(0)
+        next
+
+for i in range(0, upper):
+    try:
+        spreads.append(re.search('([+-]\d+\\.?\d?)\\(', the_spreads[i]).group(1))
+    except:
+	spreads.append(0)
         next
 
 today = str(datetime.datetime.now() - timedelta(hours=2))[0:10]

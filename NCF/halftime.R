@@ -149,4 +149,4 @@ w$mwt <- w$score.team1 + w$score.team2 + w$half.line - as.numeric(w$line.x.team1
 load("rpart.Rdat")
 w$over.prediction <- predict(r, w)
 x <- w[order(w$game_date.x.team2),c("game_id", "game_date.x.team2", "score.diff", "first.half.points", "signals",  "half.line", "spread.team1", "over.prediction", "team.team1", "team.team2")]
-x[which(x$game_date.x.team2 == "11/21/2015"),]
+x[which(x$game_date.x.team2 == "11/28/2015"),]

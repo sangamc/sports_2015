@@ -34,13 +34,23 @@ spreads = []
 
 for i in range(0, len(the_lines)):
     try:
+        if the_lines[i] == '-':
+            lines.append('-')
+        if the_spreads[i] == '-':
+            spreads.append('-')
         lines.append(re.search('(\d+\\.?\d+)\\(', the_lines[i]).group(1))
-        spreads.append(re.search('([+-]\d+\\.?\d?)\\(', the_spreads[i]).group(1))
+        spreads.append(re.search('([+-]?\d+\\.?\d?)\\(', the_spreads[i]).group(1))
     except:
         next
 
-#today = date.today()
-#today = today.strftime("%m/%d/%Y")
+
+#for i in range(0, len(the_lines)):
+#    try:
+#        lines.append(re.search('(\d+\\.?\d+)\\(', the_lines[i]).group(1))
+#        spreads.append(re.search('([+-]\d+\\.?\d?)\\(', the_spreads[i]).group(1))
+#    except:
+#        next
+
 today = str(datetime.datetime.now() - timedelta(hours=2))[0:10]
 today = time.strftime("%m/%d/%Y", time.strptime(today, '%Y-%m-%d'))
 
