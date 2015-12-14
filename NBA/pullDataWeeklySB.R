@@ -192,10 +192,8 @@ wide<-reshape(result, direction = "wide", idvar="GAME_ID", timevar="team")
 wide$secondHalfPts.TEAM1 <- wide$FINAL_PTS.TEAM1 - wide$HALF_PTS.TEAM1
 wide$secondHalfPts.TEAM2 <- wide$FINAL_PTS.TEAM2 - wide$HALF_PTS.TEAM2
 wide$secondHalfPtsTotal <- wide$secondHalfPts.TEAM1 + wide$secondHalfPts.TEAM2
-#result$SECOND_HALF_PTS <- result$FINAL_PTS - result$HALF_PTS
-#result$Over<- ddply(result, .(GAME_ID), transform, over=sum(SECOND_HALF_PTS) > LINE_HALF)$over
 wide$Over<-wide$secondHalfPtsTotal > wide$LINE_HALF.TEAM1
-
+wide <- wide[-which(is.na(wide$Over)),]
 
 write.csv(wide, file="/home/ec2-user/sports2015/NBA/sportsbook.csv", row.names=FALSE)
 
