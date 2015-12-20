@@ -11,11 +11,24 @@ import pandas as pd
 from urlparse import urlparse
 from bs4 import BeautifulSoup as bs
 from datetime import date, timedelta
+from dateutil import tz
 
 db = sqlite3.connect('/home/ec2-user/sports2015/NBA/sports.db')
 
 x=random.randint(1, 20)
 time.sleep(x)
+
+# METHOD 1: Hardcode zones:
+#from_zone = tz.gettz('UTC')
+#to_zone = tz.gettz('America/New_York')
+
+# Tell the datetime object that it's in UTC time zone since 
+# datetime objects are 'naive' by default
+#the_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#the_date = the_date.replace(tzinfo=from_zone)
+
+# Convert time zone
+#central = utc.astimezone(to_zone)
 
 #url = urllib2.urlopen('https://www.sportsbook.ag/sbk/sportsbook4/nba-betting/nba-game-lines.sbk')
 url = urllib2.urlopen('https://www.sportsbook.ag/sbk/sportsbook4/nba-betting/nba-game-lines.sbk')
@@ -60,9 +73,9 @@ for i in range(0, upper):
         spreads.append(0)
         next
 
-#today = date.today()
+today = str(date.today())
 #today = today.strftime("%m/%d/%Y")
-today = str(datetime.datetime.now() - timedelta(hours=2))[0:10]
+#today = str(datetime.datetime.now() - timedelta(hours=2))[0:10]
 today = time.strftime("%m/%d/%Y", time.strptime(today, '%Y-%m-%d'))
 
 date_time = str(datetime.datetime.now())

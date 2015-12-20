@@ -51,7 +51,8 @@ for i in range(0, len(the_lines)):
 #    except:
 #        next
 
-today = str(datetime.datetime.now() - timedelta(hours=2))[0:10]
+#today = str(datetime.datetime.now() - timedelta(hours=2))[0:10]
+today = str(date.today())
 today = time.strftime("%m/%d/%Y", time.strptime(today, '%Y-%m-%d'))
 
 date_time = str(datetime.datetime.now())
