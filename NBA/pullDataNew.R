@@ -325,11 +325,11 @@ if (length(which(result$TEAM2.TEAM2 != result$FAV)) > 0){
 
 
 ## Need to merge nba final data first
-#result <- cbind(result,nbafinal[match(result$GAME_ID, nbafinal$GAME_ID),])
-#result$secondHalfPts.TEAM1 <- result$FINAL_PTS.TEAM1 - result$HALF_PTS.TEAM1
-#result$secondHalfPts.TEAM2 <- result$FINAL_PTS.TEAM2 - result$HALF_PTS.TEAM2
-#result$secondHalfPtsTotal <- result$secondHalfPts.TEAM1 + result$secondHalfPts.TEAM2
-#result$Over<-result$secondHalfPtsTotal > result$LINE_HALF.TEAM1
+##esult <- cbind(result,nbafinal[match(result$GAME_ID, nbafinal$GAME_ID),])
+result$secondHalfPts.TEAM1 <- result$FINAL_pts.TEAM1 - result$HALF_PTS.TEAM1
+result$secondHalfPts.TEAM2 <- result$FINAL_pts.TEAM2 - result$HALF_PTS.TEAM2
+result$secondHalfPtsTotal <- result$secondHalfPts.TEAM1 + result$secondHalfPts.TEAM2
+result$Over<-result$secondHalfPtsTotal > result$LINE_HALF.TEAM1
 #result <- result[-which(is.na(result$Over)),]
 
 write.csv(result, file="/home/ec2-user/sports2015/NBA/sportsbook.csv", row.names=FALSE)
