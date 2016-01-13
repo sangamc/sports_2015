@@ -314,15 +314,12 @@ result$FAV <- ""
 result[which(result$underDog.TEAM1),]$FAV <- result[which(result$underDog.TEAM1),]$TEAM2.TEAM2
 result[which(!result$underDog.TEAM1),]$FAV <- result[which(!result$underDog.TEAM1),]$TEAM1.TEAM1
 result$MWTv3 <- 0
-if(length(which(result$HOME_TEAM.TEAM2 & result$TEAM2.TEAM2 == result$FAV)) > 0){
-        i <- which(result$HOME_TEAM.TEAM2 & result$TEAM2.TEAM2 == result$FAV)
-        result$MWTv3[i] <- abs(result[i,]$SPREAD_HALF.TEAM1) - (abs(result[i,]$SPREAD) / 2)
-}
-if (length(which(result$TEAM2.TEAM2 != result$FAV)) > 0){
-        i <- which(result$TEAM2.TEAM2 != result$FAV)
-        result$MWTv3[i] <- -abs(result[i,]$SPREAD_HALF.TEAM1) - (-abs(result[i,]$SPREAD) / 2)
-}
 
+i <- which(result$SPREAD > 0)
+result$MWTv3[i] <- result[i,]$SPREAD_HALF.TEAM1 - (result[i,]$SPREAD / 2)
+
+i <- which(result$SPREAD <= 0)
+result$MWTv3[i] <- -result[i,]$SPREAD_HALF.TEAM1 + (result[i,]$SPREAD / 2)
 
 ## Need to merge nba final data first
 ##esult <- cbind(result,nbafinal[match(result$GAME_ID, nbafinal$GAME_ID),])
