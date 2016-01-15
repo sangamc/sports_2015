@@ -1,3 +1,4 @@
+library(randomForest)
 library(plyr)
 library(RSQLite)
 library(sendmailR)
@@ -252,7 +253,7 @@ result$underSum <- result$fullSpreadU + result$mwtU + result$chd_fgU + result$ch
 result <- result[order(result$GAME_DATE),]
 result$GAME_DATE <- as.character(result$GAME_DATE)
 colnames(result)[67] <- 'chd_fg.TEAM1'
-load("~/sports2015/NBA/nbaRPartModel.Rdat")
+load("~/sports2015/NBA/randomForestModel.Rdat")
 
 #colnames(result)[120] <- "mwt.TEAM1"
 colnames(result)[which(colnames(result) == 'chd_fgm')] <- 'chd_fgm.TEAM1'
@@ -309,7 +310,8 @@ result[favorite.teams,]$P100vE <- (result[favorite.teams,]$P100.TEAM1 - result[f
 result[under.teams,]$P100vE <- (result[under.teams,]$P100.TEAM2 - result[under.teams,]$P100.TEAM2.SEASON) + (result[under.teams,]$P100.TEAM1 -
                                         result[under.teams,]$P100.TEAM1.SEASON)
 
-result$prediction<-predict(rpart.model,newdata=result, type="class")
+
+result$prediction<-predict(r,newdata=result)
 result$FAV <- ""
 result[which(result$underDog.TEAM1),]$FAV <- result[which(result$underDog.TEAM1),]$TEAM2.TEAM2
 result[which(!result$underDog.TEAM1),]$FAV <- result[which(!result$underDog.TEAM1),]$TEAM1.TEAM1
