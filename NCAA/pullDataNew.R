@@ -250,9 +250,13 @@ wide[which(abs(wide$SPREAD.TEAM1) < 3.1),]$FGS_GROUP <- '1'
 if(length(which(abs(wide$SPREAD.TEAM1) >= 3.1 & abs(wide$SPREAD.TEAM1) < 8.1)) > 0){
 wide[which(abs(wide$SPREAD.TEAM1) >= 3.1 & abs(wide$SPREAD.TEAM1) < 8.1),]$FGS_GROUP <- '2'
 }
-if(length(which(abs(wide$SPREAD.TEAM1) >= 8.1)) > 0){
-wide[which(abs(wide$SPREAD.TEAM1) >= 8.1),]$FGS_GROUP <- '3'
+if(length(which(abs(wide$SPREAD.TEAM1) >= 8.1 & abs(wide$SPREAD.TEAM1) <= 15.1)) > 0){
+wide[which(abs(wide$SPREAD.TEAM1) >= 8.1 & abs(wide$SPREAD.TEAM1) <= 15.1),]$FGS_GROUP <- '3'
 }
+if(length(which(abs(wide$SPREAD.TEAM1) > 15.1)) > 0){
+  wide[which(abs(wide$SPREAD.TEAM1) > 15.1),]$FGS_GROUP <- '4'
+}
+
 
 wide$LINE_HALF.TEAM1<-as.numeric(wide$LINE_HALF.TEAM1)
 wide$HALF_DIFF <- NA
@@ -267,8 +271,10 @@ wide$possessions.TEAM2 <- wide$HALF_FGA.TEAM2 + (wide$HALF_FTA.TEAM2 / 2) + wide
 
 wide$SEASON_ORPG.TEAM1<-wide$SEASON_OFFR.TEAM1 / wide$SEASON_GP.TEAM1
 wide$SEASON_ORPG.TEAM2<-wide$SEASON_OFFR.TEAM2 / wide$SEASON_GP.TEAM2
-wide$possessions.TEAM1.SEASON <- wide$SEASON_FGA.TEAM1 + (wide$SEASON_FTA.TEAM1 / 2) + wide$SEASON_TPG.TEAM1 - wide$SEASON_ORPG.TEAM1
-wide$possessions.TEAM2.SEASON <- wide$SEASON_FGA.TEAM2 + (wide$SEASON_FTA.TEAM2 / 2) + wide$SEASON_TPG.TEAM2 - wide$SEASON_ORPG.TEAM2
+wide$possessions.TEAM1.SEASON <- (wide$SEASON_FGA.TEAM1 / wide$SEASON_GP.TEAM1) + ((wide$SEASON_FTA.TEAM1 / wide$SEASON_GP.TEAM1) / 2) 
+                                  + wide$SEASON_TPG.TEAM1 - wide$SEASON_ORPG.TEAM1
+wide$possessions.TEAM2.SEASON <- (wide$SEASON_FGA.TEAM2 / wide$SEASON_GP.TEAM2) + ((wide$SEASON_FTA.TEAM2 / wide$SEASON_GP.TEAM2) / 2) 
+                                + wide$SEASON_TPG.TEAM2 - wide$SEASON_ORPG.TEAM2
 wide$POSSvE <- NA
 
 ## Adjust this for Fav and Dog
@@ -303,6 +309,9 @@ i <- which(wide$SPREAD.TEAM1 <= 0)
 wide$MWTv3[i] <- -wide[i,]$SPREAD_HALF.TEAM1 + (wide[i,]$SPREAD.TEAM1 / 2)
 wide$MWT <- wide$HALF_PTS.TEAM1 + wide$HALF_PTS.TEAM2 + wide$LINE_HALF.TEAM1 - wide$LINE.TEAM1
 
+colnames(wide)[grep("MWTv2", colnames(wide))] <- '2H_LD'
+colnames(wide)[grep("MWTv3", colnames(wide))] <- '2H_SD'
+
 write.csv(wide, file="/home/ec2-user/sports/testfile.csv", row.names=FALSE)
 
 sendmailV <- Vectorize( sendmail , vectorize.args = "to" )
@@ -316,6 +325,7 @@ body <- c(
   mime_part("/home/ec2-user/sports/testfile.csv", "allData.csv")
 )
 sendmailV(from, to=emails, subject, body)
+
 
 
 
