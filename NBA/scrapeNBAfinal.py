@@ -36,18 +36,7 @@ def index():
         for i in range(0, len(ids)):
             x=random.randint(5, 10)
             time.sleep(x)
-            espn = 'http://scores.espn.go.com/nba/game?gameId=' + ids[i]
-            url = urllib2.urlopen(espn)
-            soup = bs(url.read(), ['fast', 'lxml'])
-
-            game_date = soup.findAll('div', {'class':'game-date-time'})[0]
-            the_date = re.search('(\\d{4}\\-\\d{2}\\-\\d{2})', str(game_date)).group(1)
-            the_time = re.search('T(.*?)Z', str(game_date)).group(1)
-            
-            t=time.strptime(the_date, "%Y-%m-%d")
-            gdate=time.strftime('%m/%d/%Y', t)
-            x=random.randint(1,3) 
-            time.sleep(x)
+    
             espn = 'http://scores.espn.go.com/' + league + '/boxscore?gameId=' + ids[i]
             url = urllib2.urlopen(espn)
             soup = bs(url.read(), ['fast', 'lxml'])

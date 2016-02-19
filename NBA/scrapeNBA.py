@@ -57,7 +57,7 @@ def index():
             the_date = re.search('(\\d{4}\\-\\d{2}\\-\\d{2})', str(game_date)).group(1)
             game_time = re.search('T(.*?)Z', str(game_date)).group(1)            
             the_utc = the_date + ' ' + game_time
-            t=datetime.strptime(the_utc, "%Y-%m-%d %H:%M")
+            t=datetime.datetime.strptime(the_utc, "%Y-%m-%d %H:%M")
             t = t.replace(tzinfo=from_zone)
             est = t.astimezone(to_zone)
             gdate = est.strftime('%m/%d/%Y')
