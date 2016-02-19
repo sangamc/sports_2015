@@ -34,78 +34,46 @@ def index():
         print "No Final Box Scores yet."
     else:
         for i in range(0, len(ids)):
-            x=random.randint(3,10)
+            x=random.randint(5, 10)
+            time.sleep(x)
+            espn = 'http://scores.espn.go.com/nba/game?gameId=' + ids[i]
+            url = urllib2.urlopen(espn)
+            soup = bs(url.read(), ['fast', 'lxml'])
+
+            game_date = soup.findAll('div', {'class':'game-date-time'})[0]
+            the_date = re.search('(\\d{4}\\-\\d{2}\\-\\d{2})', str(game_date)).group(1)
+            the_time = re.search('T(.*?)Z', str(game_date)).group(1)
+            
+            t=time.strptime(the_date, "%Y-%m-%d")
+            gdate=time.strftime('%m/%d/%Y', t)
+            x=random.randint(1,3) 
             time.sleep(x)
             espn = 'http://scores.espn.go.com/' + league + '/boxscore?gameId=' + ids[i]
             url = urllib2.urlopen(espn)
             soup = bs(url.read(), ['fast', 'lxml'])
-            #soup = bs(open('testPage2.html'))
-            game_date = soup.findAll('div', {'class':'game-time-location'})[0].p.text
-            the_date =  re.search(',\s(.*)', game_date).group(1)
-            the_time = re.search('^(.*?),', game_date)
-            game_time = the_time.group(1)
-            t=time.strptime(the_date, "%B %d, %Y")
-            gdate=time.strftime('%m/%d/%Y', t)
-            boxscore = soup.find('table', {'class':'mod-data'})
-            try: 
-                theads=boxscore.findAll('thead')
-                the_thead = None
-                for thead in theads:
-                    ths=thead.findAll('th')
-                    labels = [x.text for x in ths]
-                    if (any("TOTALS" in s for s in labels)):
-                        the_thead = thead
-                        break
-                headers = the_thead.findAll('th')
-                header_vals = [h.text for h in headers]
-                team1_data = the_thead.nextSibling
-                tds = team1_data.findAll('td')
-                values = [v.text for v in tds]
-                remove = [v == '' for v in values]
-                remove_indices = [a for a, b in enumerate(remove) if b]
-                cleaned1 = [j for k, j in enumerate(values) if k not in remove_indices]
-                linescore = soup.find('table', {'class':'linescore'})
-                team1 = linescore.findAll('a')[0].text
-                team2 = linescore.findAll('a')[1].text
-                team1_data = the_thead.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling
-                tds = team1_data.findAll('td')
-                values = [v.text for v in tds]
-                remove = [v == '' for v in values]
-                remove_indices = [j for j, x in enumerate(remove) if x]
-                cleaned2 = [j for k, j in enumerate(values) if k not in remove_indices]
-                cleaned1.insert(0, team1)
-                cleaned2.insert(0, team2)
-                cleaned1.insert(0, ids[i])
-                cleaned2.insert(0, ids[i])
-                cleaned1.pop()
-                cleaned1.pop()
-                cleaned1.pop()
-                cleaned2.pop()
-                cleaned2.pop()
-                cleaned2.pop()
-                try:
-                    date_time = str(datetime.now())
-                    db.execute('''INSERT INTO NBAfinalstats(game_id, team, fgma, tpma, ftma, oreb, dreb, reb, ast, stl, blk, turnovers, pf, pts, timestamp ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (ids[i], team1, cleaned1[2], cleaned1[3], cleaned1[4], int(cleaned1[5]), int(cleaned1[6]), int(cleaned1[7]), int(cleaned1[8]), int(cleaned1[9]), int(cleaned1[10]), int(cleaned1[11]), int(cleaned1[12]), int(cleaned1[14]), date_time))
-                    db.commit()
-                except sqlite3.IntegrityError:
-                    print sqlite3.Error
-                try:
-                    date_time = str(datetime.now())
-                    db.execute('''INSERT INTO NBAfinalstats(game_id, team, fgma, tpma, ftma, oreb, dreb, reb, ast, stl, blk, turnovers, pf, pts, timestamp ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (ids[i], team2, cleaned2[2], cleaned2[3], cleaned2[4], int(cleaned2[5]), int(cleaned2[6]), int(cleaned2[7]), int(cleaned2[8]), int(cleaned2[9]), int(cleaned2[10]), int(cleaned2[11]), int(cleaned2[12]), int(cleaned2[14]), date_time))
-                    db.commit()
-                except sqlite3.IntegrityError:
-                    print sqlite3.Error
-            except:
-                print 'No Boxscore Available'
-
-## used for historical scraping
-#dtstart = datetime(2014,12,18)
-#hundredDaysLater = dtstart + timedelta(days=55)
-
-#for dt in rrule.rrule(rrule.DAILY, dtstart=dtstart, until=hundredDaysLater):
-#    print dt.strftime("%Y%m%d")
-#    index(dt.strftime("%Y%m%d"))
+            boxscore = soup.findAll('table', {'class':'mod-data'})
+            highlight1 = boxscore[0].findAll('tr', {'class':'highlight'})
+            highlight2 = boxscore[1].findAll('tr', {'class':'highlight'}) 
+            team1_tds=highlight1[0].findAll('td')
+            team2_tds=highlight2[0].findAll('td')           
+            tds1 = [td.text for td in team1_tds]
+            tds2 = [td.text for td in team2_tds]
+            team1 = soup.findAll('span', {'class':'abbrev'})[0].text
+            team2 = soup.findAll('span', {'class':'abbrev'})[1].text
+            try:
+                date_time = str(datetime.now())
+                db.execute('''INSERT INTO NBAfinalstats(game_id, team, fgma, tpma, ftma, oreb, dreb, reb, ast, stl, blk, turnovers, pf, pts, timestamp ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (ids[i], team1, tds1[2], tds1[3], tds1[4], int(tds1[5]), int(tds1[6]), int(tds1[7]), int(tds1[8]), int(tds1[9]), int(tds1[10]), int(tds1[11]), int(tds1[12]), int(tds1[14]), date_time))
+                db.commit()
+            except sqlite3.IntegrityError:
+                print sqlite3.Error
+            try:
+                date_time = str(datetime.now())
+                db.execute('''INSERT INTO NBAfinalstats(game_id, team, fgma, tpma, ftma, oreb, dreb, reb, ast, stl, blk, turnovers, pf, pts, timestamp ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''', (ids[i], team2, tds2[2], tds2[3], tds2[4], int(tds2[5]), int(tds2[6]), int(tds2[7]), int(tds2[8]), int(tds2[9]), int(tds2[10]), int(tds2[11]), int(tds2[12]), int(tds2[14]), date_time))
+                db.commit()
+            except sqlite3.IntegrityError:
+                print sqlite3.Error           
 
 index()
 db.close()
+
 
