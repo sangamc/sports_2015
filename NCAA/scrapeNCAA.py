@@ -53,15 +53,15 @@ def index():
         for i in range(0, len(halftime_ids)):
             x=random.randint(2, 5)
             time.sleep(x)
-            espn = 'http://scores.espn.go.com/mens-college-basketball/game?gameId=' + halftime_ids[i]
+            espn = 'http://espn.go.com/mens-college-basketball/game?gameId=' + halftime_ids[i]
             url = urllib2.urlopen(espn)
-            soup = bs(url.read(), ['fast', 'lxml'])
+            soup = bs(url.read(), ['fast', 'lxml'])	
 
             game_date = soup.findAll('div', {'class':'game-date-time'})[0]
             the_date = re.search('(\\d{4}\\-\\d{2}\\-\\d{2})', str(game_date)).group(1)
             game_time = re.search('T(.*?)Z', str(game_date)).group(1)            
             the_utc = the_date + ' ' + game_time
-            t=datetime.strptime(the_utc, "%Y-%m-%d %H:%M")
+            t=datetime.datetime.strptime(the_utc, "%Y-%m-%d %H:%M")
             t = t.replace(tzinfo=from_zone)
             est = t.astimezone(to_zone)
             gdate = est.strftime('%m/%d/%Y')
