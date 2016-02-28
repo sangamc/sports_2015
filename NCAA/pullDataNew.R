@@ -244,17 +244,20 @@ wide$Over<-wide$secondHalfPtsTotal > wide$LINE_HALF.TEAM1
 wide$SPREAD_HALF.TEAM1<-as.numeric(wide$SPREAD_HALF.TEAM1)
 wide$SPREAD.TEAM1 <- as.numeric(wide$SPREAD.TEAM1)
 wide$FGS_GROUP <- NA
-if(length(which(abs(wide$SPREAD.TEAM1) < 3.1)) > 0){
-wide[which(abs(wide$SPREAD.TEAM1) < 3.1),]$FGS_GROUP <- '1'
+if(length(which(abs(wide$SPREAD.TEAM1) < 2.1)) > 0){
+wide[which(abs(wide$SPREAD.TEAM1) < 2.1),]$FGS_GROUP <- '1'
 }
-if(length(which(abs(wide$SPREAD.TEAM1) >= 3.1 & abs(wide$SPREAD.TEAM1) < 8.1)) > 0){
-wide[which(abs(wide$SPREAD.TEAM1) >= 3.1 & abs(wide$SPREAD.TEAM1) < 8.1),]$FGS_GROUP <- '2'
+if(length(which(abs(wide$SPREAD.TEAM1) >= 2.1 & abs(wide$SPREAD.TEAM1) < 5.1)) > 0){
+wide[which(abs(wide$SPREAD.TEAM1) >= 2.1 & abs(wide$SPREAD.TEAM1) < 5.1),]$FGS_GROUP <- '2'
 }
-if(length(which(abs(wide$SPREAD.TEAM1) >= 8.1 & abs(wide$SPREAD.TEAM1) <= 15.1)) > 0){
-wide[which(abs(wide$SPREAD.TEAM1) >= 8.1 & abs(wide$SPREAD.TEAM1) <= 15.1),]$FGS_GROUP <- '3'
+if(length(which(abs(wide$SPREAD.TEAM1) >= 5.1 & abs(wide$SPREAD.TEAM1) < 9.1)) > 0){
+wide[which(abs(wide$SPREAD.TEAM1) >= 5.1 & abs(wide$SPREAD.TEAM1) < 9.1),]$FGS_GROUP <- '3'
+}
+if(length(which(abs(wide$SPREAD.TEAM1) >= 9.1 & abs(wide$SPREAD.TEAM1) < 15.1)) > 0){
+wide[which(abs(wide$SPREAD.TEAM1) >= 9.1 & abs(wide$SPREAD.TEAM1) < 15.1),]$FGS_GROUP <- '4'
 }
 if(length(which(abs(wide$SPREAD.TEAM1) > 15.1)) > 0){
-  wide[which(abs(wide$SPREAD.TEAM1) > 15.1),]$FGS_GROUP <- '4'
+  wide[which(abs(wide$SPREAD.TEAM1) > 15.1),]$FGS_GROUP <- '5'
 }
 
 
@@ -271,17 +274,13 @@ wide$possessions.TEAM2 <- wide$HALF_FGA.TEAM2 + (wide$HALF_FTA.TEAM2 / 2) + wide
 
 wide$SEASON_ORPG.TEAM1<-wide$SEASON_OFFR.TEAM1 / wide$SEASON_GP.TEAM1
 wide$SEASON_ORPG.TEAM2<-wide$SEASON_OFFR.TEAM2 / wide$SEASON_GP.TEAM2
-wide$possessions.TEAM1.SEASON <- (wide$SEASON_FGA.TEAM1 / wide$SEASON_GP.TEAM1) + ((wide$SEASON_FTA.TEAM1 / wide$SEASON_GP.TEAM1) / 2) 
-                                  + wide$SEASON_TPG.TEAM1 - wide$SEASON_ORPG.TEAM1
-wide$possessions.TEAM2.SEASON <- (wide$SEASON_FGA.TEAM2 / wide$SEASON_GP.TEAM2) + ((wide$SEASON_FTA.TEAM2 / wide$SEASON_GP.TEAM2) / 2) 
-                                + wide$SEASON_TPG.TEAM2 - wide$SEASON_ORPG.TEAM2
+wide$possessions.TEAM1.SEASON <- (wide$SEASON_FGA.TEAM1 / wide$SEASON_GP.TEAM1) + ((wide$SEASON_FTA.TEAM1 / wide$SEASON_GP.TEAM1) / 2) + wide$SEASON_TPG.TEAM1 - wide$SEASON_ORPG.TEAM1
+wide$possessions.TEAM2.SEASON <- (wide$SEASON_FGA.TEAM2 / wide$SEASON_GP.TEAM2) + ((wide$SEASON_FTA.TEAM2 / wide$SEASON_GP.TEAM2) / 2) + wide$SEASON_TPG.TEAM2 - wide$SEASON_ORPG.TEAM2
 wide$POSSvE <- NA
 
 ## Adjust this for Fav and Dog
-wide[under.teams,]$POSSvE <- ((wide[under.teams,]$possessions.TEAM2 + wide[under.teams,]$possessions.TEAM1) / 2) - ((wide[under.teams,]$possessions.TEAM2.SEASON /
-                                2 + wide[under.teams,]$possessions.TEAM1.SEASON / 2) / 2)
-wide[favorite.teams,]$POSSvE <- ((wide[favorite.teams,]$possessions.TEAM1 + wide[favorite.teams,]$possessions.TEAM2) / 2) - ((wide[favorite.teams,]$possessions.TEAM1.SEASON /
-                                2 + wide[favorite.teams,]$possessions.TEAM2.SEASON / 2) / 2)
+wide[under.teams,]$POSSvE <- ((wide[under.teams,]$possessions.TEAM2 + wide[under.teams,]$possessions.TEAM1) / 2) - ((wide[under.teams,]$possessions.TEAM2.SEASON / 2 - 1 + wide[under.teams,]$possessions.TEAM1.SEASON / 2 - 1) / 2)
+wide[favorite.teams,]$POSSvE <- ((wide[favorite.teams,]$possessions.TEAM1 + wide[favorite.teams,]$possessions.TEAM2) / 2) - ((wide[favorite.teams,]$possessions.TEAM1.SEASON / 2 - 1 + wide[favorite.teams,]$possessions.TEAM2.SEASON / 2 - 1) / 2)
 wide$P100vE <- NA
 wide$P100.TEAM1 <- wide$HALF_PTS.TEAM1 / wide$possessions.TEAM1 * 100
 wide$P100.TEAM1.SEASON <- wide$SEASON_PPG.TEAM1 / wide$possessions.TEAM1.SEASON * 100
@@ -289,17 +288,16 @@ wide$P100.TEAM2 <- wide$HALF_PTS.TEAM2 / wide$possessions.TEAM2 * 100
 wide$P100.TEAM2.SEASON <- wide$SEASON_PPG.TEAM2 / wide$possessions.TEAM2.SEASON * 100
 
 wide$P100_DIFF <- NA
-wide[under.teams,]$P100_DIFF <- (wide[under.teams,]$P100.TEAM2 - wide[under.teams,]$P100.TEAM2.SEASON) - (wide[under.teams,]$P100.TEAM1 - wide[under.teams,]$P100.TEAM1.SEASON)
-wide[favorite.teams,]$P100_DIFF <- (wide[favorite.teams,]$P100.TEAM1 - wide[favorite.teams,]$P100.TEAM1.SEASON) - (wide[favorite.teams,]$P100.TEAM2 - wide[favorite.teams,]$P100.TEAM2.SEASON)
-wide[favorite.teams,]$P100vE <- (wide[favorite.teams,]$P100.TEAM1 - wide[favorite.teams,]$P100.TEAM1.SEASON) + (wide[favorite.teams,]$P100.TEAM2 -
-                                        wide[favorite.teams,]$P100.TEAM2.SEASON)
-wide[under.teams,]$P100vE <- (wide[under.teams,]$P100.TEAM2 - wide[under.teams,]$P100.TEAM2.SEASON) + (wide[under.teams,]$P100.TEAM1 -
-                                        wide[under.teams,]$P100.TEAM1.SEASON)
+wide[under.teams,]$P100_DIFF <- (wide[under.teams,]$P100.TEAM2 - wide[under.teams,]$P100.TEAM2.SEASON - 8) - (wide[under.teams,]$P100.TEAM1 - wide[under.teams,]$P100.TEAM1.SEASON - 9)
+wide[favorite.teams,]$P100_DIFF <- (wide[favorite.teams,]$P100.TEAM1 - wide[favorite.teams,]$P100.TEAM1.SEASON - 8) - (wide[favorite.teams,]$P100.TEAM2 - wide[favorite.teams,]$P100.TEAM2.SEASON - 9)
+
+wide[favorite.teams,]$P100vE <- (wide[favorite.teams,]$P100.TEAM1 - wide[favorite.teams,]$P100.TEAM1.SEASON - 8) + (wide[favorite.teams,]$P100.TEAM2 - wide[favorite.teams,]$P100.TEAM2.SEASON - 9)
+wide[under.teams,]$P100vE <- (wide[under.teams,]$P100.TEAM2 - wide[under.teams,]$P100.TEAM2.SEASON - 8) + (wide[under.teams,]$P100.TEAM1 - wide[under.teams,]$P100.TEAM1.SEASON - 9)
 
 #wide$prediction<-predict(rpart.model,newdata=wide, type="class")
 wide$FAV <- ""
-wide[which(wide$underDog.TEAM1),]$FAV <- wide[which(wide$underDog.TEAM1),]$TEAM2.TEAM2
-wide[which(!wide$underDog.TEAM1),]$FAV <- wide[which(!wide$underDog.TEAM1),]$TEAM1.TEAM1
+wide[which(wide$underDog.TEAM1),]$FAV <- wide[which(wide$underDog.TEAM1),]$TEAM.x.TEAM2
+wide[which(!wide$underDog.TEAM1),]$FAV <- wide[which(!wide$underDog.TEAM1),]$TEAM.x.TEAM1
 wide$MWTv3 <- 0
 
 i <- which(wide$SPREAD.TEAM1 > 0)
