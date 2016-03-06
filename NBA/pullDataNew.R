@@ -279,7 +279,7 @@ result[which(abs(result$SPREAD) >= 8.1),]$FGS_GROUP <- '3'
 
 result$LINE_HALF.TEAM1<-as.numeric(result$LINE_HALF.TEAM1)
 result$HALF_DIFF <- NA
-result$underDog.TEAM1 <- result$HOME_TEAM.TEAM1 == FALSE & result$SPREAD > 0
+result$underDog.TEAM1 <- (result$HOME_TEAM.TEAM1 == FALSE & result$SPREAD > 0) | (result$HOME_TEAM.TEAM1 == TRUE & result$SPREAD < 0)
 under.teams <- which(result$underDog.TEAM1)
 favorite.teams <- which(!result$underDog.TEAM1)
 result[under.teams,]$HALF_DIFF <- result[under.teams,]$HALF_PTS.TEAM2 - result[under.teams,]$HALF_PTS.TEAM1
