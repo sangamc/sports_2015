@@ -33,14 +33,16 @@ def index():
     today = today.strftime("%Y%m%d")
     vals = [50,100]
     the_ids = []
+    the_teams = []
     for val in vals:
         print val
         url = urllib2.urlopen('http://espn.go.com/mens-college-basketball/scoreboard/_/group/' + str(val) + '/date/' + today)
+        print 'http://espn.go.com/mens-college-basketball/scoreboard/_/group/' + str(val) + '/date/' + today
         soup = bs(url.read(), ['fast', 'lxml'])
         data=re.search('window.espn.scoreboardData.*{(.*)};</script>', str(soup)).group(0)
         jsondata=re.search('({.*});window', data).group(1)
         j=jsonpickle.decode(jsondata) 
-        print "entered index" + "conf=50"
+        print "entered index" + "conf=" + str(val)
         games = j['events']
         teams1 = []
         teams2 = []
@@ -62,9 +64,12 @@ def index():
         ids2 = f7(ids2)
         ids =  ids1 + ids2
         the_ids.append(ids)      
+        the_teams.append(teams)
 
     ids = [item for sublist in the_ids for item in sublist]
-    ids = list(set(ids))
+    teams = [item for sublist in the_teams for item in sublist]
+    for id in ids:
+        print id
     for i in range(0, len(ids)):
         print len(ids)
         print ids[i]
