@@ -2,6 +2,13 @@ library(RSQLite)
 library(sendmailR)
 library(plyr)
 
+all <- read.csv("/home/ec2-user/sports/testfile.csv")
+all$GAME_DATE <- as.Date(as.character(all$GAME_DATE.x.TEAM1), format='%m/%d/%Y')
+all <- all[order(all$GAME_DATE),]
+y <- Sys.Date() - 2
+yesterday<-subset(all, GAME_DATE == y)
+share_over_y <- table(yesterday$Over)[2] / sum(table(yesterday$Over))
+
 drv <- dbDriver("SQLite")
 con <- dbConnect(drv, "/home/ec2-user/sports2015/NCAA/sports.db")
 
@@ -253,11 +260,11 @@ wide[which(abs(wide$SPREAD.TEAM1) >= 2.1 & abs(wide$SPREAD.TEAM1) < 5.1),]$FGS_G
 if(length(which(abs(wide$SPREAD.TEAM1) >= 5.1 & abs(wide$SPREAD.TEAM1) < 9.1)) > 0){
 wide[which(abs(wide$SPREAD.TEAM1) >= 5.1 & abs(wide$SPREAD.TEAM1) < 9.1),]$FGS_GROUP <- '3'
 }
-if(length(which(abs(wide$SPREAD.TEAM1) >= 9.1 & abs(wide$SPREAD.TEAM1) < 15.1)) > 0){
-wide[which(abs(wide$SPREAD.TEAM1) >= 9.1 & abs(wide$SPREAD.TEAM1) < 15.1),]$FGS_GROUP <- '4'
+if(length(which(abs(wide$SPREAD.TEAM1) >= 9.1 & abs(wide$SPREAD.TEAM1) < 14.1)) > 0){
+wide[which(abs(wide$SPREAD.TEAM1) >= 9.1 & abs(wide$SPREAD.TEAM1) < 14.1),]$FGS_GROUP <- '4'
 }
-if(length(which(abs(wide$SPREAD.TEAM1) > 15.1)) > 0){
-  wide[which(abs(wide$SPREAD.TEAM1) > 15.1),]$FGS_GROUP <- '5'
+if(length(which(abs(wide$SPREAD.TEAM1) > 14.1)) > 0){
+  wide[which(abs(wide$SPREAD.TEAM1) > 14.1),]$FGS_GROUP <- '5'
 }
 
 
@@ -279,8 +286,12 @@ wide$possessions.TEAM2.SEASON <- (wide$SEASON_FGA.TEAM2 / wide$SEASON_GP.TEAM2) 
 wide$POSSvE <- NA
 
 ## Adjust this for Fav and Dog
-wide[under.teams,]$POSSvE <- ((wide[under.teams,]$possessions.TEAM2 + wide[under.teams,]$possessions.TEAM1) / 2) - ((wide[under.teams,]$possessions.TEAM2.SEASON / 2 - 1 + wide[under.teams,]$possessions.TEAM1.SEASON / 2 - 1) / 2)
-wide[favorite.teams,]$POSSvE <- ((wide[favorite.teams,]$possessions.TEAM1 + wide[favorite.teams,]$possessions.TEAM2) / 2) - ((wide[favorite.teams,]$possessions.TEAM1.SEASON / 2 - 1 + wide[favorite.teams,]$possessions.TEAM2.SEASON / 2 - 1) / 2)
+possvEau <- ((wide[under.teams,]$possessions.TEAM2 + wide[under.teams,]$possessions.TEAM1) / 2)
+possvEbu <- ((wide[under.teams,]$possessions.TEAM2.SEASON / 2 - 1 + wide[under.teams,]$possessions.TEAM1.SEASON / 2 - 1) / 2)
+wide[under.teams,]$POSSvE <- possvEau - possvEbu
+possvEfau <- ((wide[favorite.teams,]$possessions.TEAM1 + wide[favorite.teams,]$possessions.TEAM2) / 2)
+possvEfbu <- ((wide[favorite.teams,]$possessions.TEAM1.SEASON / 2 - 1 + wide[favorite.teams,]$possessions.TEAM2.SEASON / 2 - 1) / 2)
+wide[favorite.teams,]$POSSvE <- possvEfau - possvEfbu
 wide$P100vE <- NA
 wide$P100.TEAM1 <- wide$HALF_PTS.TEAM1 / wide$possessions.TEAM1 * 100
 wide$P100.TEAM1.SEASON <- wide$SEASON_PPG.TEAM1 / wide$possessions.TEAM1.SEASON * 100
@@ -309,6 +320,25 @@ wide$MWT <- wide$HALF_PTS.TEAM1 + wide$HALF_PTS.TEAM2 + wide$LINE_HALF.TEAM1 - w
 
 colnames(wide)[grep("MWTv2", colnames(wide))] <- '2H_LD'
 colnames(wide)[grep("MWTv3", colnames(wide))] <- '2H_SD'
+
+wide$first_half_pts <- wide$HALF_PTS.TEAM1 + wide$HALF_PTS.TEAM2
+
+b<-by(wide$Over, wide['GAME_DATE.x.TEAM1'], table)
+lo<-lapply(b, function(x) x[2] / (x[1]+x[2]))
+adf<-data.frame(date=names(lo),share_over=as.character(lo))
+adf$share_over <- as.numeric(as.character(adf$share_over))
+adf$share_over[which(is.na(adf$share_over))] <- 0
+wide$GAME_DATE_MINUS1 <- as.Date(wide$GAME_DATE.x.TEAM1, format='%m/%d/%Y') - 1
+adf$date <- as.Date(as.character(adf$date), format='%m/%d/%Y')
+wide$over_share_yesterday <- adf[match(wide$GAME_DATE_MINUS1, adf$date),]$share_over
+
+wide$LAGMSECONDHALFWINIFBETOVER <- wide$over_share_yesterday
+wide$PRED_LINEHALF <-  10.479352084 + (-0.071728827 * as.numeric(wide$FGS_GROUP)) + (0.3751975374 * wide$LINE.TEAM1) + (-0.21859298 * wide$LAGMSECONDHALFWINIFBETOVER) + 
+		(-0.00911562 * wide$SPREAD.TEAM1) + (0.177476952 * wide$first_half_pts) + (0.0088223095 * wide$SPREAD_HALF.TEAM1) + (0.0486273652 * wide$POSSvE) +
+		(-0.002505684 * wide$P100vE) + (-0.007201024 * wide$P100_DIFF) + (-1.854591791 * wide$chd_fg.TEAM1) + (-0.093669162 * wide$chd_fgm.TEAM2) +
+		(-0.111442071 * wide$chd_tpm.TEAM2) + (-0.071162504 * wide$chd_ftm.TEAM2) + (-0.028082467 * wide$chd_to.TEAM2) +
+                (0.0028639313 * wide$chd_oreb.TEAM2) + 0.35
+wide$alphadiff <- wide$PRED_LINEHALF - wide$LINE_HALF.TEAM1
 
 write.csv(wide, file="/home/ec2-user/sports/testfile.csv", row.names=FALSE)
 

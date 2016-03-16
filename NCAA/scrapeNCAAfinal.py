@@ -31,13 +31,18 @@ def index():
     final_ids = []
     today = date.today() - timedelta(days=1)
     today = today.strftime("%Y%m%d")
-    url = urllib2.urlopen('http://scores.espn.go.com/mens-college-basketball/scoreboard/_/group/50/date/' + today)
-    x=random.randint(2, 4)
-    time.sleep(x)
-    soup = bs(url.read(), ['fast', 'lxml'])
-    final_ids = re.findall('http://espn.go.com/mens-college-basketball/game\?gameId=(\d+)', str(soup))
-    final_ids = list(set(final_ids) - set(game_ids)) 
-    print len(final_ids)
+    f_ids = []
+    vals = [50,100]
+    for val in vals:
+        url = urllib2.urlopen('http://scores.espn.go.com/mens-college-basketball/scoreboard/_/group/' + str(val) + '/date/' + today)
+        x=random.randint(2, 4)
+        time.sleep(x)
+        soup = bs(url.read(), ['fast', 'lxml'])
+        final_ids = re.findall('http://espn.go.com/mens-college-basketball/game\?gameId=(\d+)', str(soup))
+        final_ids = list(set(final_ids) - set(game_ids)) 
+        f_ids.append(final_ids)
+        
+    final_ids = [item for sublist in f_ids for item in sublist]
     if(len(final_ids) == 0):
         print "No Final Box Scores yet or already recorded."
     else:

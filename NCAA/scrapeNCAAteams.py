@@ -31,33 +31,40 @@ def index():
     halftime_ids = []
     today = date.today()
     today = today.strftime("%Y%m%d")
-    url = urllib2.urlopen('http://espn.go.com/mens-college-basketball/scoreboard/_/group/50/date/' + today)
-    soup = bs(url.read(), ['fast', 'lxml'])
-    data=re.search('window.espn.scoreboardData.*{(.*)};</script>', str(soup)).group(0)
-    jsondata=re.search('({.*});window', data).group(1)
-    j=jsonpickle.decode(jsondata) 
-    print "entered index" + "conf=50"
-    games = j['events']
-    teams1 = []
-    teams2 = []
-    for i in range(0, len(games)):
-        try:
-            teams1.append(games[i]['competitions'][0]['competitors'][0]['team']['abbreviation']) 
-        except:
-            continue
-        try:
-            teams2.append(games[i]['competitions'][0]['competitors'][1]['team']['abbreviation'])
-        except:
-            continue
-    teams = teams1 + teams2
-    ids1list = [re.findall('id\/(\d+)', str(g['competitions'][0]['competitors'][0]['team'])) for g in games]
-    ids1 = [item for sublist in ids1list for item in sublist]
-    ids1 = f7(ids1)
-    ids2list = [re.findall('id\/(\d+)', str(g['competitions'][0]['competitors'][1]['team'])) for g in games]
-    ids2 = [item for sublist in ids2list for item in sublist]
-    ids2 = f7(ids2)
-    ids =  ids1 + ids2
+    vals = [50,100]
+    the_ids = []
+    for val in vals:
+        print val
+        url = urllib2.urlopen('http://espn.go.com/mens-college-basketball/scoreboard/_/group/' + str(val) + '/date/' + today)
+        soup = bs(url.read(), ['fast', 'lxml'])
+        data=re.search('window.espn.scoreboardData.*{(.*)};</script>', str(soup)).group(0)
+        jsondata=re.search('({.*});window', data).group(1)
+        j=jsonpickle.decode(jsondata) 
+        print "entered index" + "conf=50"
+        games = j['events']
+        teams1 = []
+        teams2 = []
+        for i in range(0, len(games)):
+            try:
+                teams1.append(games[i]['competitions'][0]['competitors'][0]['team']['abbreviation']) 
+            except:
+                continue
+            try:
+                teams2.append(games[i]['competitions'][0]['competitors'][1]['team']['abbreviation'])
+            except:
+                continue
+        teams = teams1 + teams2
+        ids1list = [re.findall('id\/(\d+)', str(g['competitions'][0]['competitors'][0]['team'])) for g in games]
+        ids1 = [item for sublist in ids1list for item in sublist]
+        ids1 = f7(ids1)
+        ids2list = [re.findall('id\/(\d+)', str(g['competitions'][0]['competitors'][1]['team'])) for g in games]
+        ids2 = [item for sublist in ids2list for item in sublist]
+        ids2 = f7(ids2)
+        ids =  ids1 + ids2
+        the_ids.append(ids)      
 
+    ids = [item for sublist in the_ids for item in sublist]
+    ids = list(set(ids))
     for i in range(0, len(ids)):
         print len(ids)
         print ids[i]
@@ -76,8 +83,8 @@ def index():
         team = teams[i]
         if team == 'WM':
             team = 'W&M'
-        if team == 'TAM':
-            team = 'TA&M'
+        if team == 'TA&M':
+            team = 'TAMU'
         ## e.g. no season stats for http://espn.go.com/mens-college-basketball/team/stats/_/id/2395
         try:
             totals0 = soup1.find_all('tr', {'class':'total'})[0]

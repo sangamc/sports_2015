@@ -33,21 +33,29 @@ def index():
     halftime_ids = []
     today = date.today()
     today = today.strftime("%Y%m%d")
-    url = urllib2.urlopen('http://scores.espn.go.com/mens-college-basketball/scoreboard/_/group/50' + '/date/' + today)
-    soup = bs(url.read(), ['fast', 'lxml'])
-    data=re.search('window.espn.scoreboardData.*{(.*)};</script>', str(soup)).group(0)
-    jsondata=re.search('({.*});window', data).group(1)
-    j=jsonpickle.decode(jsondata)
-    games=j['events']
-    status = [game['status'] for game in games]
-    half = [s['type']['shortDetail'] for s in status]
-    index = [i for i, j in enumerate(half) if j == 'Halftime']
-    ids = [game['id'] for game in games]
-    halftime_ids = [j for k, j in enumerate(ids) if k in index]
-    halftime_ids = list(set(halftime_ids) - set(game_ids))
-    print len(halftime_ids)
+    vals = [50, 100]
+    h_ids = []
+    for val in vals:
+        url = urllib2.urlopen('http://scores.espn.go.com/mens-college-basketball/scoreboard/_/group/' + str(val) + '/date/' + today)
+        soup = bs(url.read(), ['fast', 'lxml'])
+        data=re.search('window.espn.scoreboardData.*{(.*)};</script>', str(soup)).group(0)
+        jsondata=re.search('({.*});window', data).group(1)
+        j=jsonpickle.decode(jsondata)
+        games=j['events']
+        status = [game['status'] for game in games]
+        half = [s['type']['shortDetail'] for s in status]
+        index = [i for i, j in enumerate(half) if j == 'Halftime']
+        ids = [game['id'] for game in games]
+        halftime_ids = [j for k, j in enumerate(ids) if k in index]
+        halftime_ids = list(set(halftime_ids) - set(game_ids))
+        if len(halftime_ids) > 0:
+            h_ids.append(halftime_ids)     
+        else:
+            continue
+    if len(h_ids) > 0:
+        halftime_ids = [item for sublist in h_ids for item in sublist]
     league = 'ncaa'
-    if(len(halftime_ids) == 0):
+    if len(halftime_ids) == 0:
         print "No Halftime Box Scores yet."
     else:
         for i in range(0, len(halftime_ids)):
